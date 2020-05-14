@@ -6,12 +6,11 @@ const { validate } = use('Validator')
 class DirectorioController {
   async index ({ request, response }) {
     const input = await request.all();
-    if(Object.keys(input).length > 0){
+    if(input.txtBuscar !== undefined){
       return await Directorio.query()
                               .where('telefono', input.txtBuscar)
                               .orWhere('nombre_completo', 'like', '%' + input.txtBuscar + '%')
                               .fetch();
-                ;
     }
     else{
       return await Directorio.all();
@@ -42,9 +41,30 @@ class DirectorioController {
   }
 
   async update ({ params, request, response }) {
+    //validar
+    const validation = await validate(request.all(), {
+      nombre_completo: 'required|min:3|max:100',
+      telefono: 'required|unique:directorios,telefono,id,' + params.id
+    });
+
+    if (validation.fails()) {
+      return validation.messages()
+    }
+
+    await Directorio.query().where('id', params.id).update(request.all());
+    return {
+      res: true,
+      message: "Registro modificado correctamente"
+    }
   }
 
   async destroy ({ params, request, response }) {
+    const directorio = await Directorio.findOrFail(params.id);
+    await directorio.delete();
+    return {
+      res: true,
+      message: "Registro eliminado correctamente"
+    }
   }
 }
 
