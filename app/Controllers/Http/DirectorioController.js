@@ -1,7 +1,7 @@
 'use strict'
 
 const Directorio = use('App/Models/Directorio')
-const { validate } = use('Validator')
+const { validateAll } = use('Validator')
 
 class DirectorioController {
   async index ({ request, response }) {
@@ -19,11 +19,7 @@ class DirectorioController {
 
   async store ({ request, response }) {
     //validar
-    const validation = await validate(request.all(), {
-        nombre_completo: 'required|min:3|max:100',
-        telefono: 'required|unique:directorios,telefono'
-    });
-
+    const validation = await this.validar(request.all());
     if (validation.fails()) {
       return validation.messages()
     }
@@ -42,10 +38,7 @@ class DirectorioController {
 
   async update ({ params, request, response }) {
     //validar
-    const validation = await validate(request.all(), {
-      nombre_completo: 'required|min:3|max:100',
-      telefono: 'required|unique:directorios,telefono,id,' + params.id
-    });
+    const validation = await this.validar(request.all(), params.id);
 
     if (validation.fails()) {
       return validation.messages()
@@ -65,6 +58,15 @@ class DirectorioController {
       res: true,
       message: "Registro eliminado correctamente"
     }
+  }
+
+  async validar(input, id = null)
+  {
+    let ruleUpdate = id === null ? '' : ',id,' + id;
+    return await validateAll(input, {
+        nombre_completo: 'required|min:3|max:100',
+        telefono: 'required|unique:directorios,telefono' + ruleUpdate
+    });
   }
 }
 
