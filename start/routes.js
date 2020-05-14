@@ -19,3 +19,5 @@ const Route = use('Route')
 Route.get('/', () => {
   return { greeting: 'Pagina de contactos' }
 })
+
+Route.resource('directorios', 'DirectorioController').apiOnly();

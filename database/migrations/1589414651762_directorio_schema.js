@@ -7,10 +7,10 @@ class DirectorioSchema extends Schema {
   up () {
     this.create('directorios', (table) => {
       table.increments()
-      table.string('nombre_completo', 100);
-      table.string('direccion').nullable();
-      table.integer('telefono').unique();
-      table.string('url_foto').nullable();
+      table.string('nombre_completo', 100).notNullable();
+      table.string('direccion');
+      table.integer('telefono').unique().notNullable();
+      table.string('url_foto');
       table.timestamps()
     })
   }
