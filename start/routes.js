@@ -20,5 +20,17 @@ Route.get('/', () => {
   return { greeting: 'Pagina de contactos' }
 })
 
-Route.resource('directorios', 'DirectorioController').apiOnly();
-Route.post('cargar_foto/:id', 'DirectorioController.cargarFoto');
+
+Route.post('users', 'UserController.store');
+Route.post('login', 'UserController.login');
+
+Route.group(() => {
+  Route.resource('directorios', 'DirectorioController').apiOnly();
+  Route.post('cargar_foto/:id', 'DirectorioController.cargarFoto');
+
+  Route.get('user', 'UserController.getUser');
+  Route.post('logout', 'UserController.logout');
+}).middleware('auth');
+
+
+

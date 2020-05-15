@@ -2,7 +2,6 @@
 
 const Directorio = use('App/Models/Directorio')
 const { validateAll } = use('Validator')
-const { Helpers } = use('Helpers')
 
 class DirectorioController {
   async index ({ request, response }) {
