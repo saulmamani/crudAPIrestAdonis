@@ -21,3 +21,4 @@ Route.get('/', () => {
 })
 
 Route.resource('directorios', 'DirectorioController').apiOnly();
+Route.post('cargar_foto/:id', 'DirectorioController.cargarFoto');

@@ -2,6 +2,7 @@
 
 const Directorio = use('App/Models/Directorio')
 const { validateAll } = use('Validator')
+const { Helpers } = use('Helpers')
 
 class DirectorioController {
   async index ({ request, response }) {
@@ -18,13 +19,16 @@ class DirectorioController {
   }
 
   async store ({ request, response }) {
+    let input = request.all();
+    
     //validar
-    const validation = await this.validar(request.all());
+    const validation = await this.validar(input);
     if (validation.fails()) {
       return validation.messages()
     }
 
-    const directorio = await Directorio.create(request.all());
+    const directorio = await Directorio.create(input);
+
     return {
       res: true,
       directorio: directorio,
@@ -67,6 +71,35 @@ class DirectorioController {
         nombre_completo: 'required|min:3|max:100',
         telefono: 'required|unique:directorios,telefono' + ruleUpdate
     });
+  }
+
+  async cargarFoto({request, response, params}){
+    const avatar = request.file('avatar', {
+      types: ['image'],
+      size: '2mb'
+    });
+
+    const nombreArchivo = params.id + '.' + avatar.extname;
+    await avatar.move('./public/fotografias', {
+      name: nombreArchivo,
+      overwrite: true
+    })
+
+    if(!avatar.moved()){
+      return response.status(422).send({
+        res: false,
+        message: avatar.error()
+      })
+    }
+
+    const directorio = await Directorio.findOrFail(params.id);
+    directorio.url_foto = nombreArchivo;
+    await directorio.save();
+
+    return response.status(200).send({
+      res: true,
+      message: "Foto registrada correctamente!"
+    })
   }
 }
 
